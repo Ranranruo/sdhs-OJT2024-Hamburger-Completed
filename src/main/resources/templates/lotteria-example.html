@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Lotteria</title>
+    <link rel="stylesheet" th:href="@{/styles/font.css}"/>
+    <link rel="stylesheet" th:href="@{/styles/normalize.css}"/>
+    <link rel="stylesheet" th:href="@{/styles/lotteria.css}"/>
+    <link rel="stylesheet" href="../static/styles/lotteria.css">
+</head>
+<body>
+<header class="title-box wrap-box">
+    <h3 class="inner-box">롯데리아</h3>
+</header>
+<article class="wrap-box">
+    <section class="inner-box tab-box">
+        <label aria-label="추천메뉴 탭" role="tab">
+            <span>추천메뉴</span>
+            <input checked="checked" hidden="hidden" name="tab-content" type="radio"/>
+        </label>
+        <label aria-label="전체메뉴 탭" role="tab">
+            <span>전체메뉴</span>
+            <input hidden="hidden" name="tab-content" type="radio"/>
+        </label>
+        <label class="modal-btn" aria-label="추천메뉴 탭" role="tab">
+            <span>메뉴추가</span>
+        </label>
+        <label>
+            <input id="hamburger-list" class="search-field" type="text">
+        </label>
+    </section>
+    <section class="inner-box list-box">
+        <div class="hamburger-box">
+            <img class="hamburger-image" alt="데리버거" src="/images/데리버거.png"/>
+            <p class="hamburger-data hamburger-name">데리버거</p>
+            <p class="hamburger-data hamburger-price">3,500원</p>
+        </div>
+    </section>
+    <!--        <button id="test-button" onclick="window.alert('버튼 클릭')">나만의 버튼</button>-->
+</article>
+<dialog id="modal">
+    <form action="/lotteria-add-menu" method="POST" enctype="multipart/form-data">
+        <h1>메뉴추가</h1>
+        <ul class="options">
+            <li class="option check">
+                <label for="menu-new">신메뉴</label>
+                <input type="checkbox" id="menu-new" name="isNew" value="true" hidden>
+                <label for="menu-recomended">추천메뉴</label>
+                <input type="checkbox" id="menu-recomended" name="isRecommended" value="true" hidden>
+                <input type="hidden" name="isRecommended" value="false" hidden>
+                <input type="hidden" name="isNew" value="false" hidden>
+                <label for="menu-image">이미지</label>
+                <input type="file" accept="image/*" id="menu-image" name="image" hidden>
+            </li>
+            <li class="option">
+                <label for="menu-name">메뉴이름</label>
+                <input required autofocus type="text" id="menu-name" name="name">
+            </li>
+            <li class="option">
+                <label for="menu-price">가격</label>
+                <input required type="number" id="menu-price" name="price">
+            </li>
+        </ul>
+        <div class="buttons">
+            <button>메뉴추가</button>
+            <button class="modal-btn" type="button">취소하기</button>
+        </div>
+
+    </form>
+</dialog>
+<script>
+    // window.addEventListener("DOMContentLoaded", async () => {
+    //     const searchInput = document.getElementById('search-input');
+    // })
+    window.addEventListener("DOMContentLoaded", async () => {
+        // const button = document.querySelector("#test-button");
+        // const clickEvent = new Event("click");
+        // button.dispatchEvent(clickEvent);
+        const isExistImageSrc = async (src) => {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.src = src;
+                img.onerror = () => resolve(false);
+                img.onload = () => resolve(true);
+            });
+        }
+        const $hamburgerList = document.querySelector(".list-box");
+        // 1번
+        const setMenus = async (searchKeyword = "") => {
+            // searchKeyword = searchKeyword.match(/[!@#$%^&*]/, "") ?? "";
+            if (searchKeyword != "") {
+                searchKeyword = [...searchKeyword].reduce((acc, char) => {
+                    if (char.match(/[!@#$%^&*~?\/]/)) {
+                        return acc + "\\" + char;
+                    }
+                    return acc + char;
+                }, '')
+            }
+            searchKeyword = encodeURIComponent(searchKeyword);
+            const hamburgers = await fetch("lotteria-menus?hamburgerName=" + searchKeyword).then(data => data.json());
+            let hamburgersHTML = "";
+            for (const hamburger of hamburgers) {
+                // const isExistSrc = await isExistImageSrc(hamburger.imagePath);
+                // if(!isExistSrc) hamburger.imagePath = "https://dummyimage.com/210x225/000000/ffffff&text=Hamburger";
+                // if(!isExistSrc) hamburger.imagePath = "/images/미라클버거.png";
+                const hambugerBox =`
+                <div class="hamburger-box ${hamburger.isNew ? 'new' : ''} ${hamburger.isRecommended ? 'recommend' : ''}">
+                    <img class="hamburger-image" alt="${hamburger.name}" src="${hamburger.imagePath}" />
+                    <p class="hamburger-data hamburger-name">${hamburger.name}</p>
+                    <p class="hamburger-data hamburger-price">${hamburger.price.toLocaleString() + '원'}</p>
+                </div>`
+                hamburgersHTML = hamburgersHTML + hambugerBox;
+            }
+            $hamburgerList.innerHTML = hamburgersHTML;
+            // $hamburgerList.innerHTML = hamburgers.reduce((acc, hamburger) => {
+            //     // const isExistSrc = await isExistImageSrc(hamburger.imagePath);
+            //     // if(!isExistSrc) hamburger.imagePath = "https://dummyimage.com/210x225/000000/ffffff&text=Hamburger";
+            //     return acc + `
+            //     <div class="hamburger-box">
+            //         <img class="hamburger-image" alt="${hamburger.name}" src="${hamburger.imagePath}" />
+            //         <p class="hamburger-data hamburger-name">${hamburger.name}</p>
+            //         <p class="hamburger-data hamburger-price">${hamburger.price.toLocaleString() + '원'}</p>
+            //     </div>`;
+            // }, '').then();
+
+        }
+
+        setMenus();
+
+        // 2번
+        // const hamburgers = await (await fetch("lotteria-menus")).json();
+
+
+        document.querySelector("input#hamburger-list").addEventListener("keyup", async (e) => {
+            const code = e.code;
+            if (code === "Enter") {
+                await setMenus(e.target.value);
+                e.target.value = "";
+            }
+        })
+
+        // let hamburgersHTML = '';
+        // hamburgers.forEach(hamburger => {
+        //     hamburgersHTML = hamburgersHTML + `
+        //     <div class="hamburger-box">
+        //         <img class="hamburger-image" alt="${hamburger.name}" src="${hamburger.imagePath}" />
+        //         <p class="hamburger-data hamburger-name">${hamburger.name}</p>
+        //         <p class="hamburger-data hamburger-price">${hamburger.price.toLocaleString() + '원'}</p>
+        //     </div>`;
+        // })
+
+        const $modal = document.querySelector("dialog")
+        const $$modalBtn = document.querySelectorAll(".modal-btn");
+
+        $$modalBtn[0].addEventListener('click', () => {
+            $modal.showModal();
+        });
+        $$modalBtn[1].addEventListener('click', () => {
+            $modal.close();
+        })
+        $modal.addEventListener("click", (e) => {
+            if (!e.target.closest("form")) $modal.close();
+        })
+        // [...$$modalBtn].forEach(el=>el.addEventListener("click", ()=>{
+        //     if(isModalShow)$modal.style.display = 'none';
+        //     else $modal.style.display = 'flex';
+        //     isModalShow = !isModalShow;
+        // }))
+        // $modal.addEventListener("click", (e)=>{
+        //     if(e.target.closest("form") == null){
+        //         isModalShow = false;
+        //         $modal.style.display = 'none';
+        //     }
+        // })
+    });
+
+
+</script>
+</body>
+</html>

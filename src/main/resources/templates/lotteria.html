@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Lotteria</title>
+    <link rel="stylesheet" th:href="@{/styles/font.css}" />
+    <link rel="stylesheet" th:href="@{/styles/normalize.css}" />
+    <link rel="stylesheet" th:href="@{/styles/lotteria.css}" />
+</head>
+<body>
+    <header class="title-box wrap-box">
+        <h3 class="inner-box">롯데리아</h3>
+    </header>
+    <article class="wrap-box">
+        <section class="inner-box tab-box">
+            <label aria-label="추천메뉴 탭" role="tab">
+                <a href="/lotteria?category=recommended">
+                <span>추천메뉴</span>
+                <input th:checked="${category eq 'recommended'}" hidden="hidden" name="tab-content" type="radio" />
+                </a>
+            </label>
+            <label aria-label="전체메뉴 탭" role="tab">
+                <a href="/lotteria">
+                    <span>전체메뉴</span>
+                    <input th:checked="${!(category eq 'recommended')}" hidden="hidden" name="tab-content" type="radio" />
+                </a>
+            </label>
+        </section>
+        <section class="inner-box list-box">
+            <div class="hamburger-box" th:each="hamburger: ${hamburgers}">
+                <img class="hamburger-image" th:alt="${hamburger.getName()}" th:src="${hamburger.getImagePath()}" />
+                <p class="hamburger-data hamburger-name" th:text="${hamburger.getName()}"></p>
+                <p class="hamburger-data hamburger-price" th:text="${hamburger.getPriceByFormat() + '원'}"></p>
+            </div>
+        </section>
+    </article>
+</body>
+</html>
