@@ -7,6 +7,7 @@
     <link rel="stylesheet" th:href="@{/styles/normalize.css}"/>
     <link rel="stylesheet" th:href="@{/styles/lotteria.css}"/>
     <link rel="stylesheet" href="../static/styles/lotteria.css">
+    <link rel="stylesheet" href="../static/styles/normalize.css">
 </head>
 <body>
 <header class="title-box wrap-box">
@@ -22,7 +23,7 @@
             <span>전체메뉴</span>
             <input hidden="hidden" name="tab-content" type="radio"/>
         </label>
-        <label class="modal-btn" aria-label="추천메뉴 탭" role="tab">
+        <label class="modal-btn add-menu-show" aria-label="추천메뉴 탭" role="tab">
             <span>메뉴추가</span>
         </label>
         <label>
@@ -50,7 +51,7 @@
                 <input type="hidden" name="isRecommended" value="false" hidden>
                 <input type="hidden" name="isNew" value="false" hidden>
                 <label for="menu-image">이미지</label>
-                <input type="file" accept="image/*" id="menu-image" name="image" hidden>
+                <input type="file" accept="image/*" id="menu-image" name="image" hidden required>
             </li>
             <li class="option">
                 <label for="menu-name">메뉴이름</label>
@@ -63,19 +64,17 @@
         </ul>
         <div class="buttons">
             <button>메뉴추가</button>
-            <button class="modal-btn" type="button">취소하기</button>
+            <button class="hide-form-btn" type="button">취소하기</button>
         </div>
 
     </form>
 </dialog>
 <script>
-    // window.addEventListener("DOMContentLoaded", async () => {
-    //     const searchInput = document.getElementById('search-input');
-    // })
+
     window.addEventListener("DOMContentLoaded", async () => {
-        // const button = document.querySelector("#test-button");
-        // const clickEvent = new Event("click");
-        // button.dispatchEvent(clickEvent);
+        const $ = (selector) => document.querySelector(selector);
+        const $$ = (selector) => document.querySelectorAll(selector);
+        // 이미지 여부 확인 함수
         const isExistImageSrc = async (src) => {
             return new Promise((resolve, reject) => {
                 const img = new Image();
@@ -84,9 +83,80 @@
                 img.onload = () => resolve(true);
             });
         }
-        const $hamburgerList = document.querySelector(".list-box");
-        // 1번
+        // 모달 함수
+        const useModalForm = (dialogElement) => {
+            // dialog태그가 아니면 리턴
+            if(dialogElement.tagName !== "DIALOG") throw new Error("dialog태그의 엘리먼트가 아닙니다.");
+            const $dialog = dialogElement;
+            if(!$dialog.querySelector("form")) throw new Error("dialog태그의 자식중 form태그가 없습니다.");
+            const $form = $dialog.querySelector("form")
+            const $title = $form.querySelector("h1");
+            let $$showBtnList = [];
+            let $$hideBtnList = [];
+            let submitEvent = ()=>{};
+            $dialog.addEventListener("click", () => {
+                if (!e.target.closest("form")) $dialog.close();
+            })
+            $form.addEventListener("submit", (e)=> {
+                submitEvent(e);
+            })
+            const getForm = () => $form;
+            const addShowBtn = (element, method, uri, title, callback = ()=>{}) => {
+                element.addEventListener("click", ()=>{
+                    setTitle(title);
+                    setMethod(method);
+                    setUri(uri);
+                    $dialog.showModal();
+                    callback();
+                });
+                $$showBtnList = [...$$showBtnList, element];
+            }
+
+            const addHideBtn = (element, callback = ()=>{}) => {
+                element.addEventListener("click", ()=>{
+                    $dialog.close();
+                    callback();
+                });
+                $$hideBtnList = [...$$hideBtnList, element];
+            }
+            const setTitle = (text) => {
+                $title.innerText = text;
+            }
+            const clear = () => {
+                $form.action = "";
+                $form.method = "";
+                [...$form].forEach(el=>{
+                    if(el.tagName !== "INPUT") return;
+                    switch (el.type) {
+                        case "hidden" : break;
+                        case "checkbox" :
+                            el.checked = false;
+                            break;
+                        default :
+                            el.value = "";
+                    }
+                })
+                return true;
+            }
+            const setSubmitFunc = (func) => {
+                if(typeof func !== "function") throw new Error("타입이 함수가 아니에요")
+                submitEvent = func;
+            }
+            const setUri = (uri) => $form.action = uri;
+            const setMethod = (method) => $form.method = method;
+
+            return {addShowBtn, addHideBtn, setTitle, clear, setSubmitFunc, setUri, setMethod, getForm};
+        }
+
+        const $modal = document.querySelector("dialog");
+        // useModalForm(dialogElement) dialogElement 요소 작식중 formElement 요소가 있어야 한다.
+        const modalForm = useModalForm($modal);
+        // addShowBtn(Element, Method, Uri, Title)
+        modalForm.addShowBtn($(".add-menu-show"), "GET", "/lotteria-add-menu", "메뉴추가");
+
+        modalForm.addHideBtn($(".hide-form-btn"));
         const setMenus = async (searchKeyword = "") => {
+            const $hamburgerList = document.querySelector(".list-box");
             // searchKeyword = searchKeyword.match(/[!@#$%^&*]/, "") ?? "";
             if (searchKeyword != "") {
                 searchKeyword = [...searchKeyword].reduce((acc, char) => {
@@ -100,37 +170,56 @@
             const hamburgers = await fetch("lotteria-menus?hamburgerName=" + searchKeyword).then(data => data.json());
             let hamburgersHTML = "";
             for (const hamburger of hamburgers) {
-                // const isExistSrc = await isExistImageSrc(hamburger.imagePath);
-                // if(!isExistSrc) hamburger.imagePath = "https://dummyimage.com/210x225/000000/ffffff&text=Hamburger";
-                // if(!isExistSrc) hamburger.imagePath = "/images/미라클버거.png";
-                const hambugerBox =`
+                const hamburgerBox = `
                 <div class="hamburger-box ${hamburger.isNew ? 'new' : ''} ${hamburger.isRecommended ? 'recommend' : ''}">
                     <img class="hamburger-image" alt="${hamburger.name}" src="${hamburger.imagePath}" />
-                    <p class="hamburger-data hamburger-name">${hamburger.name}</p>
-                    <p class="hamburger-data hamburger-price">${hamburger.price.toLocaleString() + '원'}</p>
+                    <div class="hamburger-content">
+                        <div class="hamburger-text">
+                            <p class="hamburger-data hamburger-name">${hamburger.name}</p>
+                            <p class="hamburger-data hamburger-price">${hamburger.price.toLocaleString() + '원'}</p>
+                        </div>
+                        <div class="hamburger-btns">
+                            <div class="hamburger-edit-btn hamburger-btn" data-burger-name="${hamburger.name}">수정</div>
+                            <div class="hamburger-remove-btn hamburger-btn" data-burger-name="${hamburger.name}">삭제</div>
+                        </div>
+                    </div>
                 </div>`
-                hamburgersHTML = hamburgersHTML + hambugerBox;
+                hamburgersHTML = hamburgersHTML + hamburgerBox;
             }
             $hamburgerList.innerHTML = hamburgersHTML;
-            // $hamburgerList.innerHTML = hamburgers.reduce((acc, hamburger) => {
-            //     // const isExistSrc = await isExistImageSrc(hamburger.imagePath);
-            //     // if(!isExistSrc) hamburger.imagePath = "https://dummyimage.com/210x225/000000/ffffff&text=Hamburger";
-            //     return acc + `
-            //     <div class="hamburger-box">
-            //         <img class="hamburger-image" alt="${hamburger.name}" src="${hamburger.imagePath}" />
-            //         <p class="hamburger-data hamburger-name">${hamburger.name}</p>
-            //         <p class="hamburger-data hamburger-price">${hamburger.price.toLocaleString() + '원'}</p>
-            //     </div>`;
-            // }, '').then();
+            const $$hamburgerRemoveBtn = document.querySelectorAll(".hamburger-remove-btn");
+            $$hamburgerRemoveBtn.forEach(btn => btn.addEventListener("click", async (e) => {
+                const hamburgerName = e.target.dataset.burgerName;
+                const res = await fetch(`/lotteria-menu/${hamburgerName}`, {
+                    method: "DELETE",
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                }).then(data => data.json()) ?? null
+                if (res == null) alert("실패~")
+                alert(res.result);
+                setMenus();
+            }))
+            $$(".hamburger-edit-btn").forEach(el=> {
+                // modalForm.addShowBtn(el, "PUT", `/lotteria-edit-menu/${el.dataset.burgerName}`, "메뉴수정", ()=>{
+                //     const $name = modalForm.getForm().name;
+                //     $name.value = el.dataset.burgerName;
+                //     $name.readOnly = true;
+                // });
+                modalForm.addShowBtn(el, "POST", `/lotteria-add-menu`, "메뉴수정", ()=>{
+                    const $hamburgerBox = el.closest(".hamburger-box");
+                    const $name = modalForm.getForm().name;
+                    $name.image = $hamburgerBox.querySelector("img");
+                    $name.value = el.dataset.burgerName;
+                    $name.readOnly = true;
+                });
 
+            })
         }
-
         setMenus();
 
-        // 2번
-        // const hamburgers = await (await fetch("lotteria-menus")).json();
 
-
+        // 검색 기능
         document.querySelector("input#hamburger-list").addEventListener("keyup", async (e) => {
             const code = e.code;
             if (code === "Enter") {
@@ -138,40 +227,6 @@
                 e.target.value = "";
             }
         })
-
-        // let hamburgersHTML = '';
-        // hamburgers.forEach(hamburger => {
-        //     hamburgersHTML = hamburgersHTML + `
-        //     <div class="hamburger-box">
-        //         <img class="hamburger-image" alt="${hamburger.name}" src="${hamburger.imagePath}" />
-        //         <p class="hamburger-data hamburger-name">${hamburger.name}</p>
-        //         <p class="hamburger-data hamburger-price">${hamburger.price.toLocaleString() + '원'}</p>
-        //     </div>`;
-        // })
-
-        const $modal = document.querySelector("dialog")
-        const $$modalBtn = document.querySelectorAll(".modal-btn");
-
-        $$modalBtn[0].addEventListener('click', () => {
-            $modal.showModal();
-        });
-        $$modalBtn[1].addEventListener('click', () => {
-            $modal.close();
-        })
-        $modal.addEventListener("click", (e) => {
-            if (!e.target.closest("form")) $modal.close();
-        })
-        // [...$$modalBtn].forEach(el=>el.addEventListener("click", ()=>{
-        //     if(isModalShow)$modal.style.display = 'none';
-        //     else $modal.style.display = 'flex';
-        //     isModalShow = !isModalShow;
-        // }))
-        // $modal.addEventListener("click", (e)=>{
-        //     if(e.target.closest("form") == null){
-        //         isModalShow = false;
-        //         $modal.style.display = 'none';
-        //     }
-        // })
     });
 
 

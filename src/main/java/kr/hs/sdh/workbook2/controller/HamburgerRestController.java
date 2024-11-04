@@ -14,6 +14,7 @@ import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 public class HamburgerRestController {
@@ -55,5 +56,13 @@ public class HamburgerRestController {
             httpServletResponse.sendRedirect("lotteria-example");
         }
 //        return new RedirectView("/lotteria-example");
+    }
+
+    @DeleteMapping("/lotteria-menu/{hamburgerName}")
+    private Map<String, Object> deleteMenu (@PathVariable("hamburgerName") String hamburgerName) {
+        Hamburger deleteHamburger = new Hamburger();
+        deleteHamburger.setName(hamburgerName);
+        hamburgerService.removeHamburger(deleteHamburger);
+        return Map.of("result", "successed");
     }
 }

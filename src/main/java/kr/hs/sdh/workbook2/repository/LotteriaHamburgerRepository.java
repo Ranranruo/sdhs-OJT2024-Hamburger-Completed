@@ -24,6 +24,8 @@ public final class LotteriaHamburgerRepository implements HamburgerRepository, I
 
     private Set<Hamburger> hamburgers;
 
+    private Set<Hamburger> deletedHamburgers;
+
     public LotteriaHamburgerRepository(final ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
@@ -55,7 +57,7 @@ public final class LotteriaHamburgerRepository implements HamburgerRepository, I
     public void deleteHamburger(Hamburger hamburger) {
         // 1
         this.hamburgers.removeIf(beforeHamburger -> beforeHamburger.equals(hamburger));
-
+//            if(hamburger.getPrice())
         // 2
         if(this.hamburgers.contains(hamburger)){
             this.hamburgers.remove(hamburger);

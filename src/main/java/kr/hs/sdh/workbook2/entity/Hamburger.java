@@ -26,6 +26,7 @@ public class Hamburger {
         this.isRecommended = isRecommended;
     }
 
+    public Hamburger() {}
     public String getName() {
         return name;
     }

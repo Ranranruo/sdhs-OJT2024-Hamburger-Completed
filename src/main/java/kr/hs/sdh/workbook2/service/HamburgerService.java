@@ -57,4 +57,8 @@ public final class HamburgerService {
             }
         }
     }
+
+    public void removeHamburger(final Hamburger deleteHamburger) {
+        this.hamburgerRepository.deleteHamburger(deleteHamburger);
+    }
 }
