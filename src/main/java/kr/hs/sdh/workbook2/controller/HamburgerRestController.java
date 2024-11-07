@@ -3,6 +3,7 @@ package kr.hs.sdh.workbook2.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import kr.hs.sdh.workbook2.entity.Hamburger;
+import kr.hs.sdh.workbook2.entity.History;
 import kr.hs.sdh.workbook2.service.HamburgerService;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,6 +30,7 @@ public class HamburgerRestController {
         List<Hamburger> hamburgers = this.hamburgerService.getHamburgers();
 //         defaultValue로 if 문을 없애도 됨
 //        if(hamburgerName == null || hamburgerName.isEmpty()) return hamburgers;
+
         return hamburgers
                 .stream()
                 .filter(hamburger -> hamburger.getName().matches(".*" + hamburgerName + ".*"))
@@ -50,8 +52,6 @@ public class HamburgerRestController {
             HttpServletResponse httpServletResponse
     ) throws IOException {
         if (hamburger != null) {
-            System.out.println(hamburger.isRecommended);
-            System.out.println(hamburger.isNew);
             hamburgerService.setHamburger(hamburger, multipartFile);
             httpServletResponse.sendRedirect("lotteria-example");
         }
@@ -60,8 +60,7 @@ public class HamburgerRestController {
 
     @DeleteMapping("/lotteria-menu/{hamburgerName}")
     private Map<String, Object> deleteMenu (@PathVariable("hamburgerName") String hamburgerName) {
-        Hamburger deleteHamburger = new Hamburger();
-        deleteHamburger.setName(hamburgerName);
+        Hamburger deleteHamburger = new Hamburger(hamburgerName, 0, null, false, false);
         hamburgerService.removeHamburger(deleteHamburger);
         return Map.of("result", "successed");
     }

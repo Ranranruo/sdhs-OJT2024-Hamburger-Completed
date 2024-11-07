@@ -2,7 +2,7 @@ package kr.hs.sdh.workbook2.service;
 
 import kr.hs.sdh.workbook2.entity.Hamburger;
 import kr.hs.sdh.workbook2.repository.HamburgerRepository;
-import kr.hs.sdh.workbook2.repository.LotteriaHamburgerRepository;
+
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,14 +20,14 @@ public final class HamburgerService {
     private final HamburgerRepository hamburgerRepository;
 
     // "HamburgerService" 클래스의 생성자
-    public HamburgerService(LotteriaHamburgerRepository hamburgerRepository) {
+    public HamburgerService(HamburgerRepository hamburgerRepository) {
         this.hamburgerRepository = hamburgerRepository;
     }
 
     public List<Hamburger> findRecommendedHamburgers() {
       return this.hamburgerRepository.findHamburgers()
               .stream()
-              .filter(hamburger -> hamburger.isRecommended)
+              .filter(Hamburger::getIsRecommended)
               .toList();
     };
 
@@ -44,7 +44,6 @@ public final class HamburgerService {
 
     public void setHamburger(Hamburger hamburger, final MultipartFile multipartFile) {
         final String fileName = multipartFile.getOriginalFilename();
-
         if(fileName != null && !fileName.isEmpty()) {
             try{
                 final File file = new File(ABSOLUTE_PATH + fileName);

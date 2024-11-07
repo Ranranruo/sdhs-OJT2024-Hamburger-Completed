@@ -152,9 +152,15 @@
         // useModalForm(dialogElement) dialogElement 요소 작식중 formElement 요소가 있어야 한다.
         const modalForm = useModalForm($modal);
         // addShowBtn(Element, Method, Uri, Title)
-        modalForm.addShowBtn($(".add-menu-show"), "GET", "/lotteria-add-menu", "메뉴추가");
+        modalForm.addShowBtn($(".add-menu-show"), "POST", "/lotteria-add-menu", "메뉴추가", ()=>{
+            const $name = modalForm.getForm().name;
+            $name.readOnly = false
+        });
 
-        modalForm.addHideBtn($(".hide-form-btn"));
+        modalForm.addHideBtn($(".hide-form-btn"), ()=>{
+            const $name = modalForm.getForm().name;
+            $name.value = "";
+        });
         const setMenus = async (searchKeyword = "") => {
             const $hamburgerList = document.querySelector(".list-box");
             // searchKeyword = searchKeyword.match(/[!@#$%^&*]/, "") ?? "";
@@ -171,8 +177,13 @@
             let hamburgersHTML = "";
             for (const hamburger of hamburgers) {
                 const hamburgerBox = `
-                <div class="hamburger-box ${hamburger.isNew ? 'new' : ''} ${hamburger.isRecommended ? 'recommend' : ''}">
-                    <img class="hamburger-image" alt="${hamburger.name}" src="${hamburger.imagePath}" />
+                <form action="/history" method="POST" class="sub-form hamburger-buy-form hamburger-box ${hamburger.isNew ? 'new' : ''} ${hamburger.isRecommended ? 'recommend' : ''}">
+                    <input type="text" name="name" value="${hamburger.name}" hidden>
+                    <input type="number" name="price" value="${hamburger.price}" hidden>
+                    <div class="hamburger-image">
+                        <img class="hamburger-image" alt="${hamburger.name}" src="${hamburger.imagePath}" />
+                        <button class="buy">구매하기</button>
+                    </div>
                     <div class="hamburger-content">
                         <div class="hamburger-text">
                             <p class="hamburger-data hamburger-name">${hamburger.name}</p>
@@ -183,7 +194,7 @@
                             <div class="hamburger-remove-btn hamburger-btn" data-burger-name="${hamburger.name}">삭제</div>
                         </div>
                     </div>
-                </div>`
+                </form>`
                 hamburgersHTML = hamburgersHTML + hamburgerBox;
             }
             $hamburgerList.innerHTML = hamburgersHTML;
@@ -215,6 +226,21 @@
                 });
 
             })
+
+            $$(".hamburger-buy-form").forEach(el => {
+
+                // el => form 태그
+
+                el.addEventListener("submit", async(e)=>{
+                    e.preventDefault();
+                    const res = await fetch("/hamburger-sell", {
+                        method : "post",
+                        body: new FormData(el)
+                    }).then(data=>data.text());
+                    alert(res);
+                    setMenus();
+                })
+            })
         }
         setMenus();
 
@@ -227,6 +253,8 @@
                 e.target.value = "";
             }
         })
+
+
     });
 
 

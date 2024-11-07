@@ -5,18 +5,18 @@ import java.text.DecimalFormat;
 
 public class Hamburger {
 
-    private String name;
-    private int price;
+    private final String name;
+    private final int price;
     private String imagePath;
-    public boolean isNew;
-    public boolean isRecommended;
+    private final boolean isNew;
+    private final boolean isRecommended;
 
     @ConstructorProperties(value = {
-            "name",
-            "price",
-            "imagePath",
-            "isNew",
-            "isRecommended"
+        "name",
+        "price",
+        "imagePath",
+        "isNew",
+        "isRecommended"
     })
     public Hamburger(String name, int price, String imagePath, boolean isNew, boolean isRecommended) {
         this.name = name;
@@ -26,21 +26,12 @@ public class Hamburger {
         this.isRecommended = isRecommended;
     }
 
-    public Hamburger() {}
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public int getPrice() {
         return price;
-    }
-
-    public void setPrice(int price) {
-        this.price = price;
     }
 
     public String getImagePath() {
@@ -51,20 +42,12 @@ public class Hamburger {
         this.imagePath = imagePath;
     }
 
-    public boolean isNew() {
+    public boolean getIsNew() {
         return isNew;
     }
 
-    public void setNew(boolean aNew) {
-        isNew = aNew;
-    }
-
-    public boolean isRecommended() {
+    public boolean getIsRecommended() {
         return isRecommended;
-    }
-
-    public void setRecommended(boolean recommended) {
-        isRecommended = recommended;
     }
 
     public String getPriceByFormat(){
@@ -83,4 +66,5 @@ public class Hamburger {
     public int hashCode() {
         return 123;
     }
+
 }

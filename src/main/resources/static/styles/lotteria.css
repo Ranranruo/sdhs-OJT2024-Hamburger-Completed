@@ -52,19 +52,37 @@ body {
         }
     }
 }
-
 .list-box {
     display: grid;
     column-gap: 35px;
     row-gap: 40px;
     grid-template-columns: repeat(3, 1fr);
-
+    .hamburger-box {
+        display: flex; flex-direction: column; gap: 10px;
+    }
     & .hamburger-image {
+        position: relative;
         width: 100%;
         height: 225px;
-        object-fit: contain;
-        border: 1px solid #efe1f3;
-        background-color: #ffffff;
+        > img {
+            width: 100%; height: 100%;
+            object-fit: contain;
+            border: 1px solid #efe1f3;
+            background-color: #ffffff;
+        }
+        > button {
+            transition: .2s;
+            opacity: 0;
+            position: absolute; bottom: 10px; left: 50%;
+            translate: -50% 0;
+            color: #fff; background-color: #63cc5b;
+            border: none; outline: none;
+            padding: .5em 1em;
+            border-radius: 5px;
+        }
+    }
+    > .hamburger-box:hover .hamburger-image > button {
+        opacity: 1;
     }
 
     & .hamburger-data {

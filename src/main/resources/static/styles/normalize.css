@@ -1,8 +1,6 @@
-html, body, h3 {
+*{
     margin: 0;
     padding: 0;
-}
-*{
     text-decoration: none;
     color: inherit;
     list-style: none;
