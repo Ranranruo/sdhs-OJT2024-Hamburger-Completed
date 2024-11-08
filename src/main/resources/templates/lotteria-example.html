@@ -6,8 +6,8 @@
     <link rel="stylesheet" th:href="@{/styles/font.css}"/>
     <link rel="stylesheet" th:href="@{/styles/normalize.css}"/>
     <link rel="stylesheet" th:href="@{/styles/lotteria.css}"/>
-    <link rel="stylesheet" href="../static/styles/lotteria.css">
-    <link rel="stylesheet" href="../static/styles/normalize.css">
+    <link rel="stylesheet" href="styles/lotteria.css">
+    <link rel="stylesheet" href="styles/normalize.css">
 </head>
 <body>
 <header class="title-box wrap-box">
@@ -40,34 +40,36 @@
     <!--        <button id="test-button" onclick="window.alert('버튼 클릭')">나만의 버튼</button>-->
 </article>
 <dialog id="modal">
-    <form action="/lotteria-add-menu" method="POST" enctype="multipart/form-data">
-        <h1>메뉴추가</h1>
-        <ul class="options">
-            <li class="option check">
-                <label for="menu-new">신메뉴</label>
-                <input type="checkbox" id="menu-new" name="isNew" value="true" hidden>
-                <label for="menu-recomended">추천메뉴</label>
-                <input type="checkbox" id="menu-recomended" name="isRecommended" value="true" hidden>
-                <input type="hidden" name="isRecommended" value="false" hidden>
-                <input type="hidden" name="isNew" value="false" hidden>
-                <label for="menu-image">이미지</label>
-                <input type="file" accept="image/*" id="menu-image" name="image" hidden required>
-            </li>
-            <li class="option">
-                <label for="menu-name">메뉴이름</label>
-                <input required autofocus type="text" id="menu-name" name="name">
-            </li>
-            <li class="option">
-                <label for="menu-price">가격</label>
-                <input required type="number" id="menu-price" name="price">
-            </li>
-        </ul>
-        <div class="buttons">
-            <button>메뉴추가</button>
-            <button class="hide-form-btn" type="button">취소하기</button>
-        </div>
+    <div>
+        <form action="/lotteria-add-menu" method="POST" enctype="multipart/form-data">
+            <h1>메뉴추가</h1>
+            <ul class="options">
+                <li class="option check">
+                    <label for="menu-new">신메뉴</label>
+                    <input type="checkbox" id="menu-new" name="isNew" value="true" hidden>
+                    <label for="menu-recomended">추천메뉴</label>
+                    <input type="checkbox" id="menu-recomended" name="isRecommended" value="true" hidden>
+                    <input type="hidden" name="isRecommended" value="false" hidden>
+                    <input type="hidden" name="isNew" value="false" hidden>
+                    <label for="menu-image">이미지</label>
+                    <input type="file" accept="image/*" id="menu-image" name="image" hidden required>
+                </li>
+                <li class="option">
+                    <label for="menu-name">메뉴이름</label>
+                    <input required autofocus type="text" id="menu-name" name="name">
+                </li>
+                <li class="option">
+                    <label for="menu-price">가격</label>
+                    <input required type="number" id="menu-price" name="price">
+                </li>
+            </ul>
+            <div class="buttons">
+                <button>메뉴추가</button>
+                <button class="hide-form-btn" type="button">취소하기</button>
+            </div>
 
-    </form>
+        </form>
+    </div>  
 </dialog>
 <script>
 
@@ -86,23 +88,25 @@
         // 모달 함수
         const useModalForm = (dialogElement) => {
             // dialog태그가 아니면 리턴
-            if(dialogElement.tagName !== "DIALOG") throw new Error("dialog태그의 엘리먼트가 아닙니다.");
+            if (dialogElement.tagName !== "DIALOG") throw new Error("dialog태그의 엘리먼트가 아닙니다.");
             const $dialog = dialogElement;
-            if(!$dialog.querySelector("form")) throw new Error("dialog태그의 자식중 form태그가 없습니다.");
+            if (!$dialog.querySelector("form")) throw new Error("dialog태그의 자식중 form태그가 없습니다.");
             const $form = $dialog.querySelector("form")
             const $title = $form.querySelector("h1");
             let $$showBtnList = [];
             let $$hideBtnList = [];
-            let submitEvent = ()=>{};
+            let submitEvent = () => {
+            };
             $dialog.addEventListener("click", () => {
                 if (!e.target.closest("form")) $dialog.close();
             })
-            $form.addEventListener("submit", (e)=> {
+            $form.addEventListener("submit", (e) => {
                 submitEvent(e);
             })
             const getForm = () => $form;
-            const addShowBtn = (element, method, uri, title, callback = ()=>{}) => {
-                element.addEventListener("click", ()=>{
+            const addShowBtn = (element, method, uri, title, callback = () => {
+            }) => {
+                element.addEventListener("click", () => {
                     setTitle(title);
                     setMethod(method);
                     setUri(uri);
@@ -112,8 +116,9 @@
                 $$showBtnList = [...$$showBtnList, element];
             }
 
-            const addHideBtn = (element, callback = ()=>{}) => {
-                element.addEventListener("click", ()=>{
+            const addHideBtn = (element, callback = () => {
+            }) => {
+                element.addEventListener("click", () => {
                     $dialog.close();
                     callback();
                 });
@@ -125,10 +130,11 @@
             const clear = () => {
                 $form.action = "";
                 $form.method = "";
-                [...$form].forEach(el=>{
-                    if(el.tagName !== "INPUT") return;
+                [...$form].forEach(el => {
+                    if (el.tagName !== "INPUT") return;
                     switch (el.type) {
-                        case "hidden" : break;
+                        case "hidden" :
+                            break;
                         case "checkbox" :
                             el.checked = false;
                             break;
@@ -139,7 +145,7 @@
                 return true;
             }
             const setSubmitFunc = (func) => {
-                if(typeof func !== "function") throw new Error("타입이 함수가 아니에요")
+                if (typeof func !== "function") throw new Error("타입이 함수가 아니에요")
                 submitEvent = func;
             }
             const setUri = (uri) => $form.action = uri;
@@ -152,12 +158,12 @@
         // useModalForm(dialogElement) dialogElement 요소 작식중 formElement 요소가 있어야 한다.
         const modalForm = useModalForm($modal);
         // addShowBtn(Element, Method, Uri, Title)
-        modalForm.addShowBtn($(".add-menu-show"), "POST", "/lotteria-add-menu", "메뉴추가", ()=>{
+        modalForm.addShowBtn($(".add-menu-show"), "POST", "/lotteria-add-menu", "메뉴추가", () => {
             const $name = modalForm.getForm().name;
             $name.readOnly = false
         });
 
-        modalForm.addHideBtn($(".hide-form-btn"), ()=>{
+        modalForm.addHideBtn($(".hide-form-btn"), () => {
             const $name = modalForm.getForm().name;
             $name.value = "";
         });
@@ -211,13 +217,13 @@
                 alert(res.result);
                 setMenus();
             }))
-            $$(".hamburger-edit-btn").forEach(el=> {
+            $$(".hamburger-edit-btn").forEach(el => {
                 // modalForm.addShowBtn(el, "PUT", `/lotteria-edit-menu/${el.dataset.burgerName}`, "메뉴수정", ()=>{
                 //     const $name = modalForm.getForm().name;
                 //     $name.value = el.dataset.burgerName;
                 //     $name.readOnly = true;
                 // });
-                modalForm.addShowBtn(el, "POST", `/lotteria-add-menu`, "메뉴수정", ()=>{
+                modalForm.addShowBtn(el, "POST", `/lotteria-add-menu`, "메뉴수정", () => {
                     const $hamburgerBox = el.closest(".hamburger-box");
                     const $name = modalForm.getForm().name;
                     $name.image = $hamburgerBox.querySelector("img");
@@ -231,12 +237,12 @@
 
                 // el => form 태그
 
-                el.addEventListener("submit", async(e)=>{
+                el.addEventListener("submit", async (e) => {
                     e.preventDefault();
                     const res = await fetch("/hamburger-sell", {
-                        method : "post",
+                        method: "post",
                         body: new FormData(el)
-                    }).then(data=>data.text());
+                    }).then(data => data.text());
                     alert(res);
                     setMenus();
                 })

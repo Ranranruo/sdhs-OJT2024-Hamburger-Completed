@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" th:href="@{/styles/font.css}"/>
+    <link rel="stylesheet" th:href="@{/styles/normalize.css}"/>
+    <link rel="stylesheet" th:href="@{/styles/login.css}"/>
+    <link rel="stylesheet" href="styles/normalize.css">
+    <link rel="stylesheet" href="styles/font.css">
+    <link rel="stylesheet" href="styles/login.css">
+</head>
+<body>
+<!--<button id="attack">공격</button>-->
+<header></header>
+<main>
+    <div class="background">
+        <div class="text">
+            <h2>민석페이지에 오신것을 환영할께요.</h2>
+            <h2>로그인창 입니다.</h2>
+        </div>
+    </div>
+    <form action="/login" method="POST">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+        <h2>LOGIN</h2>
+        <div class="inputs">
+            <input name="id" type="text" placeholder="id"/>
+            <input name="password" type="password" placeholder="password"/>
+            <a href="#">비밀번호를 잊으셨나요?</a>
+        </div>
+        <div class="buttons">
+            <button type="submit">로그인</button>
+            <button type="button">회원가입</button>
+        </div>
+    </form>
+</main>
+<footer></footer>
+<script th:inline="javascript" th:src="@{/scripts/login.js}"></script>
+<script>
+    // document.getElementById("attack").addEventListener("click", ()=>{
+    //     fetch("/delete-user?id=admin",{method: "DELETE"}).then(data=>data.text()).then(data=>console.log(data));
+    // })
+</script>
+</body>
+</html>
