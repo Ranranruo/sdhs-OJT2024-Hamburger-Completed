@@ -1,5 +1,9 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html
+        lang="ko"
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+>
 <head>
     <meta charset="UTF-8">
     <title>Lotteria</title>
@@ -11,7 +15,8 @@
 </head>
 <body>
 <header class="title-box wrap-box">
-    <h3 class="inner-box">롯데리아</h3>
+    <h3 class="inner-box" sec:authorize="hasRole('GUEST')">롯데리아</h3>
+    <h3 class="inner-box" sec:authorize="hasRole('ADMIN')">롯데리아(관리자)</h3>
 </header>
 <article class="wrap-box">
     <section class="inner-box tab-box">
@@ -23,9 +28,11 @@
             <span>전체메뉴</span>
             <input hidden="hidden" name="tab-content" type="radio"/>
         </label>
-        <label class="modal-btn add-menu-show" aria-label="추천메뉴 탭" role="tab">
-            <span>메뉴추가</span>
-        </label>
+        <th:block sec:authorize="hasRole('ADMIN')">
+            <label class="modal-btn add-menu-show" aria-label="추천메뉴 탭" role="tab">
+                <span>메뉴추가</span>
+            </label>
+        </th:block>
         <label>
             <input id="hamburger-list" class="search-field" type="text">
         </label>
@@ -69,7 +76,7 @@
             </div>
 
         </form>
-    </div>  
+    </div>
 </dialog>
 <script>
 
@@ -106,7 +113,7 @@
             const getForm = () => $form;
             const addShowBtn = (element, method, uri, title, callback = () => {
             }) => {
-                element.addEventListener("click", () => {
+                element?.addEventListener("click", () => {
                     setTitle(title);
                     setMethod(method);
                     setUri(uri);
@@ -118,7 +125,7 @@
 
             const addHideBtn = (element, callback = () => {
             }) => {
-                element.addEventListener("click", () => {
+                element?.addEventListener("click", () => {
                     $dialog.close();
                     callback();
                 });

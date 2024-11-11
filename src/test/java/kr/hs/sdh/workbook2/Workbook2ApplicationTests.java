@@ -8,6 +8,14 @@ class Workbook2ApplicationTests {
 
     @Test
     void contextLoads() {
+
+    }
+    int returnOne(){
+        return 1;
+    }
+    @Test
+    void main() {
+        System.out.println((double) returnOne());
     }
 
 }
