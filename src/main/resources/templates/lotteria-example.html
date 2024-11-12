@@ -28,7 +28,7 @@
             <span>전체메뉴</span>
             <input hidden="hidden" name="tab-content" type="radio"/>
         </label>
-        <th:block sec:authorize="hasRole('ADMIN')">
+        <th:block sec:authorize="hasRole('g')">
             <label class="modal-btn add-menu-show" aria-label="추천메뉴 탭" role="tab">
                 <span>메뉴추가</span>
             </label>
